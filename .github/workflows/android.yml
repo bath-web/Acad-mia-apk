@@ -11,22 +11,34 @@ jobs:
           unzip -q "$(ls *.zip | head -1)" -d tmp
           d=$(dirname "$(find tmp -name package.json -not -path '*/node_modules/*' | head -1)")
           mv "$d" app
-      - name: Nom de l'application = Aca
-        run: sed -i 's/"appName": *"[^"]*"/"appName": "Aca"/' capacitor.config.json
+      - name: Renommer l application en Aca
+        run: |
+          sed -i 's/"appName": *"[^"]*"/"appName": "Aca"/' capacitor.config.json
         working-directory: app
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
       - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: 17 }
-      - run: npm install
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Installer
+        run: npm install
         working-directory: app
-      - run: npx cap add android
+      - name: Ajouter Android
+        run: npx cap add android
         working-directory: app
-      - run: npx capacitor-assets generate --android --assetPath resources --iconBackgroundColor "#ffffff" --splashBackgroundColor "#ffffff"
+      - name: Icones
+        run: |
+          npx capacitor-assets generate --android --assetPath resources --iconBackgroundColor "#ffffff" --splashBackgroundColor "#ffffff"
         working-directory: app
-      - run: npx cap sync android
+      - name: Synchroniser
+        run: npx cap sync android
         working-directory: app
-      - run: chmod +x gradlew && ./gradlew assembleDebug
+      - name: Construire l APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
         working-directory: app/android
       - uses: actions/upload-artifact@v4
         with:
